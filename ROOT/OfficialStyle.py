@@ -1,4 +1,4 @@
-from ROOT import kBlack, TLatex, TCanvas, TPad
+from ROOT import kBlack, TLatex, TCanvas, TPad, gStyle
 
 def officialStyle(style):
     style.SetCanvasColor (0)
@@ -16,9 +16,10 @@ def officialStyle(style):
     style.SetPadBorderMode (0)
     
     style.SetPadBottomMargin(0.13)
-    style.SetPadTopMargin (0.05)
+    style.SetPadTopMargin (0.07)
     style.SetPadLeftMargin (0.17)
-    style.SetPadRightMargin (0.03566265)
+#    style.SetPadRightMargin (0.03566265)
+    style.SetPadRightMargin (0.055)
     style.SetPadGridX (0)
     style.SetPadGridY (0)
     style.SetPadTickX (1)
@@ -70,6 +71,8 @@ def officialStyle(style):
     style.SetTitleFont (42,"Y")
     style.SetOptStat (0)
 
+officialStyle(gStyle)
+    
 def cmsPrel(lumi,  energy,  simOnly,  onLeft=True,  sp=0):
     latex = TLatex()
   
@@ -82,13 +85,13 @@ def cmsPrel(lumi,  energy,  simOnly,  onLeft=True,  sp=0):
     latex.SetName("lumiText")
     latex.SetTextFont(42)
 
-    lumyloc = 0.965
-    cmsyloc = 0.893
-    simyloc = 0.858
+    lumyloc = 0.95
+    cmsyloc = 0.89 - 0.025
+    simyloc = 0.858 - 0.025
     if sp!=0:
-        lumyloc = 0.945
-        cmsyloc = 0.85
-        simyloc = 0.8
+        lumyloc = 0.93
+        cmsyloc = 0.85 - 0.04
+        simyloc = 0.8 - 0.04
     cmsalign = 31
     cmsxloc = 0.924
     if onLeft:
@@ -113,7 +116,7 @@ def cmsPrel(lumi,  energy,  simOnly,  onLeft=True,  sp=0):
     else:
         latex.SetTextAlign(31) # align right=31
         latex.SetTextSize(textSize*0.6/0.75)
-        latex.DrawLatex(0.965,lumyloc,Form(" (%.0f TeV)", energy))
+        latex.DrawLatex(0.965,lumyloc, "{energy} TeV".format(energy=energy))
   
  
     latex.SetTextAlign(cmsalign) # align left / right
@@ -234,9 +237,9 @@ class CanvasRatio( TCanvas ):
 
 if __name__ == "__main__":
 
-    from ROOT import gStyle, TH1F, gPad, TLegend
+    from ROOT import TH1F, gPad, TLegend
 
-    officialStyle(gStyle)
+    # officialStyle(gStyle)
     h = TH1F("h", "; p_{T} (GeV); a.u.", 10, -5, 5)
     h.Sumw2()
     h.FillRandom("gaus", 1000)
