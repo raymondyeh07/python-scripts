@@ -3,7 +3,9 @@ import sys
 
 nmodules = float(sys.argv[1])
 width = 40.
-pricem2 = 30.
+pricem2 = 34.60
+# 411 euros.
+# 10 jours
 
 sizes = np.array([82., 38.])
 module = np.array([3, 6])
