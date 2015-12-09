@@ -1,52 +1,103 @@
 import pprint
 import unittest 
-from stack import stack 
+from stack import Stack 
+
+'''Binary tree with the 3 standard traversal algorithms.
+
+Each node has two children. Therefore, when visiting a given node, 
+it is possible to: 
+1: deal with the current node, then its left child (the left subtree), 
+and then its right child (pre-order)
+2: deal with the left child, the current node, and the right child (in-order)
+3: deal with the left child, the right child, and the current node (post-order)
+
+In the case of a tree with an arbitrary number of children (not binary), 
+in-order would not make sense, and there are two traversal algorithms: 
+1: deal with the node and then with all children (with all subtrees) (breadth-first search or BFS)
+2: deal with all children and finally with the node (depth-first search of DFS)  
+
+The traversal algorithms are implemented as separate functions, 
+following a simple visitor pattern. 
+
+The advantage of this pattern are the following: 
+
+- by changing the node class (e.g. subclassing and overloading the visit function), 
+a user can decide on what to do when a node is visited. 
+See for example NodeSquared
+
+- by providing additional visitors, the user can change the order of the graph
+traversal, or change the implementation of a given graph traversal algorithm 
+for better performance. In this module, I played with several implementations.
+
+Exercises for Alice: 
+- modify this file to provide post-order recursive and iterative algorithms, 
+with their test cases 
+- provide a similar module for a tree with an arbitrary number of children. 
+the module should feature a Node class, a DFS visitor and a BFS visitor.
+- do the same in C++ 
+'''
 
 
 class Node(object):
     '''
-    There is no need for a Tree class. In fact the Node is equivalent
-    to the subtree rooted at this node.
+    Implements a binary tree: 
+    each node has two children, left and right.
+
+    Important: There is no need for a Tree class. 
+    Actually, the Node is equivalent to the subtree rooted at this node.
     '''
     
     def __init__(self, value):
-        self.value = value
-        self.left = None
-        self.right = None
-        self.visited = False
+        '''constructor. 
+        value can be anything, even a complex object. 
+        '''
+        self.value = value   # wrapped object
+        self.left = None     # left child 
+        self.right = None    # right child
+        # self.visited = False
+        # not necessary for standard visitors, and inelegant.
+        # indeed,  it is good to able to call another visitor on the same nodes
+        # without having to re-initialize the nodes.
 
     def visit(self):
         return self.value
 
     def set_children(self, left, right):
+        '''set both the left and right children'''
         self.left = left
         self.right = right
 
     def __repr__(self):
+        '''unique string representation'''
         left = 'null'
         right = 'null'
         if self.left:
             left = self.left.value
         if self.right:
             right = self.right.value
-        return str('node: {val} {left} {right} {visited}'.format(
+        return str('node: {val} {left} {right}'.format(
             val = self.value,
             left = left,
-            right = right,
-            visited = self.visited
+            right = right
             ) )
 
+class NodeSquared(Node):
+    def visit(self):
+        return self.value**2
 
-def dfs_preorder_recursive(node, result):
+    
+def preorder_recursive(node, result):
+    '''pre-order, recursive implementation'''
     if node is None:
         return 
     result.append( node.visit() )
-    dfs_preorder_recursive(node.left, result)
-    dfs_preorder_recursive(node.right, result)
+    preorder_recursive(node.left, result)
+    preorder_recursive(node.right, result)
 
 
-def dfs_preorder_iterative(root, result):
-    todo = stack()
+def preorder_iterative(root, result):
+    '''pre-order, iterative implementation'''
+    todo = Stack()
     todo.append(root)
     while len(todo):
         node = todo.pop()
@@ -57,24 +108,28 @@ def dfs_preorder_iterative(root, result):
         result.append( node.value )
 
 
-def dfs_inorder_recursive(node, result):
+def inorder_recursive(node, result):
+    '''in-order, recursive implementation'''
     if node is None:
         return 
-    dfs_inorder_recursive(node.left, result)
+    inorder_recursive(node.left, result)
     result.append( node.visit() )
-    dfs_inorder_recursive(node.right, result)
+    inorder_recursive(node.right, result)
 
 
 
-def dfs_inorder_iterative_visit1(root, result):
-    '''requires a visit flag to be added to each node.
+def inorder_iterative_visit1(root, result):
+    '''
+    in-order, iterative implementation.
+    
+    requires a visited flag to be added to each node.
     not very elegant, but obvious solution to cycling problem.
     In python I don't think this solution is better than the recursive one,
     because we still have a stack -> so mem usage is the same.
     In C++ or java, the stack should be declared on the heap...
     otherwise I don't see what is the gain. 
     '''
-    todo = stack()
+    todo = Stack()
     todo.append( root )
     while len(todo):
         node = todo.peek()
@@ -91,24 +146,27 @@ def dfs_inorder_iterative_visit1(root, result):
             todo.pop()
 
 
-def dfs_inorder_iterative_visit2(root, result):
-    '''cleaner and more understandable than visit1.'''
-    todo = stack()
+def inorder_iterative_visit2(root, result):
+    '''cleaner and more understandable than visit1, but there is still 
+    a visited flag'''
+    todo = Stack()
     todo.append( root )
     while len(todo):
         node = todo.pop()
         if node:
             if not node.visited:
                 node.visited = True
-                todo.append( node ) # readding the node for second visit
+                todo.append( node ) # re-adding the node for second visit
                 todo.append( node.left )
             else:
                 result.append( node.value )
                 todo.append( node.right )
 
 
-def dfs_inorder_iterative(root, result):
-    todo = stack()
+def inorder_iterative(root, result):
+    '''Finally, without the visited flag... 
+    took me some time to find this one...'''
+    todo = Stack()
     todo.append( root )
     last = None
     while len(todo):
@@ -124,66 +182,61 @@ def dfs_inorder_iterative(root, result):
 
 
 
-def dfs_morris(node):
-    return []
-
-
 
 class TreeTestCase( unittest.TestCase ):
 
     def setUp(self):
+        '''
+        called before every test. 
+        left = up 
+        right = down 
+        that is: 2 is the left child of 4, and 5 its right child
+
+            0
+           / \
+          2   1
+         / \
+        4   3
+         \
+          5
+        '''
+        # building all nodes
         self.nodes = dict( (i, Node(i) ) for i in range(6) )
+        # setting children. note that each node keeps track of its children,
+        # no need for the polytree class
         self.nodes[4].set_children( self.nodes[2], self.nodes[5] )
         self.nodes[2].set_children( self.nodes[0], self.nodes[3] )
+        # here setting the right child directly:
         self.nodes[0].right = self.nodes[1]
+        # decide on a root for the tests
         self.root = self.nodes[4]
 
-    ## def test_tree_structure(self):
-    ##     self.assertMultiLineEqual(
-    ##         pprint.pformat(self.nodes),
-    ##         '{0: node: 0 null 1,\n 1: node: 1 null null,\n 2: node: 2 0 3,\n 3: node: 3 null null,\n 4: node: 4 2 5,\n 5: node: 5 null null}')
-
-    # can I avoid this boilerplate code with decorators? 
-    def test_dfs_inorder_recursive(self):
+    def test_inorder_recursive(self):
         result = []
-        dfs_inorder_recursive( self.root, result )
+        inorder_recursive( self.root, result )
+        # the result is equal to [0, 1, 2, 3, 4, 5]
         self.assertEqual(result, range(6) )
 
-    def test_dfs_preorder_recursive(self):
+    def test_preorder_recursive(self):
         result = []
-        dfs_preorder_recursive( self.root, result )
+        preorder_recursive( self.root, result )
         self.assertEqual(result, [4, 2, 0, 1, 3, 5] )
 
-    def test_dfs_preorder_iterative(self):
+    def test_preorder_iterative(self):
         result = []
-        dfs_preorder_iterative( self.root, result )
+        preorder_iterative( self.root, result )
         self.assertEqual(result, [4, 2, 0, 1, 3, 5] )
 
-    def test_dfs_inorder_iterative_1(self):
+    def test_inorder_iterative_1(self):
         result = []
-        root = Node(1)
-        root.left = Node(0)
-        root.right = Node(2)
-        dfs_inorder_iterative( root, result )
-        self.assertEqual(result, [0,1,2] )
- 
-    def test_dfs_inorder_iterative_2(self):
-        result = []
-        root = Node(3)
-        root.left = Node(1)
-        root.right = Node(4)
-        root.left.left = Node(0)
-        root.left.right = Node(2)
-        root.right.right = Node(5)
-        dfs_inorder_iterative( root, result )
+        inorder_iterative( self.root, result )
         self.assertEqual(result, range(6) )
  
-      
-
-    ## def test_dfs_morris(self):
-    ##     result = dfs_morris( self.root )
-    ##     self.assertEqual(result, range(6) )
-
+    def test_inorder_iterative_2(self):
+        result = []
+        inorder_iterative( self.root, result )
+        self.assertEqual(result, range(6) )
+ 
 
 if __name__ == '__main__':
     unittest.main()

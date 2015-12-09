@@ -4,6 +4,8 @@ Provides a stack class.
 
 class Stack(object):
     '''
+    Simple stack class
+
     Does not inherit from list because i want to restrict the interface
     to the bare minimum.
 
