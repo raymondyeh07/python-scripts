@@ -10,7 +10,6 @@ Each node may have several parents.
 The PolyTree is directed and acyclic. It may have multiple roots ( a node without a parent)
 
 
-
 The traversal algorithms are implemented as separate functions, 
 following a simple visitor pattern. 
 
@@ -56,34 +55,29 @@ class Node(object):
         self.value = value   # wrapped object
         self.children = []
         self.parents = []
-        self.parentsandchildren =  [] # ask colin about best Python way to deal with this
+        self.undirectedlinks =  [] # ask colin about best Python way to deal with this
         self.visited = False
-        # not necessary for standard visitors, and inelegant.
-        # indeed,  it is good to able to call another visitor on the same nodes
-        # without having to re-initialize the nodes.
-
+      
     def visit(self):
         return self.value
 
     def set_children(self, children):
         '''set the children'''
         self.children = children
-        self.parentsandchildren.extend(children)
+        self.undirectedlinks.extend(children)
         
     def set_parents(self, parents):
         '''set the parents'''
         self.parents = parents
-        self.parentsandchildren.extend(parents)
+        self.undirectedlinks.extend(parents)
         
-      
-
     def get_linked_nodes(self, type):  #ask colin, I imagine there is a more elegant Python way to do this
         if (type is "children"):
             return self.children
         if(type is "parents"):
             return self.parents
-        if(type is "parentsandchildren"):
-            return self.parentsandchildren
+        if(type is "undirected"):
+            return self.undirectedlinks
             
          
 
@@ -115,20 +109,24 @@ def bfs_parents_recursive(nodes, result):
 def bfs_recursive(nodes,result, linktype ):
     '''pre-order, recursive implementation
     each recursion is one level down the tree
-    linktype can be "children", "parents","parentsandchildren" '''
+    linktype can be "children", "parents","undirected" '''
     linknodes=[]
     if len(nodes) is 0:
         return 
     for node in nodes:
-        result.append( node.visit() )
+        if not node.visited:
+            result.append( node.visit() )
     for node in nodes:
-        linknodes.extend(node.get_linked_nodes(linktype))
+        if not node.visited:
+            linknodes.extend(node.get_linked_nodes(linktype))
+            node.visited=True
     bfs_recursive(linknodes, result, linktype)
 
 def bfs_iterative(nodes, result,linktype):
     '''breadth first iterative implementation
      each iteration is one level down the tree
-     linktype can be "children", "parents","parentsandchildren" '''    
+     linktype can be "children", "parents","undirected" 
+     visited flag is used for "undirected" '''    
     linknodes=[]
     while len(nodes):
         for node in nodes:
@@ -149,13 +147,16 @@ def dfs_recursive(root, result, linktype):
     if root is None:
         return 
     result.append( root.visit() )
+    root.visited=True
     for node in root.get_linked_nodes(linktype):
-        dfs_recursive(node, result, linktype)
+        if (not node.visited): 
+            dfs_recursive(node, result, linktype)
         
 
 def dfs_iterative(root, result, linktype):
     '''depth first search iterative implementation
-        in same order as for recursion'''    
+        in same order as for recursion
+     visited flag is used for "undirected" '''    
     todo = Stack()
     todo.append(root)
     while len(todo):
@@ -169,14 +170,17 @@ def dfs_iterative(root, result, linktype):
 
 def dfs_iterative_2(root, result,linktype):
     '''depth first search iterative implementation
-        children are traversed in a different order to previous algorithms (but its more efficient)''' 
+        children are traversed in a different order to previous algorithms (but its more efficient)
+        ''' 
     todo = Stack()
     todo.append(root)
     while len(todo):
         node = todo.pop()
         result.append(node.visit())
+        node.visited=True;
         for node in node.get_linked_nodes(linktype):
-            todo.append(node)
+            if (not node.visited):     
+                todo.append(node)
         
 
 
@@ -202,8 +206,8 @@ class TreeTestCase( unittest.TestCase ):
           / \
          /   \
         0--2  6
-         \
-          \
+         \   /
+          \ /
            3
            
            
@@ -225,9 +229,9 @@ class TreeTestCase( unittest.TestCase ):
     def set_link(self, parent, child):
             '''set the parents child links'''
             parent.children.append(child)
-            parent.parentsandchildren.append(child)
+            parent.undirectedlinks.append(child)
             child.parents.append(parent)                 
-            child.parentsandchildren.append(parent)    
+            child.undirectedlinks.append(parent)    
                         
     def test_bfs_recursive(self):
         result = []
@@ -235,6 +239,11 @@ class TreeTestCase( unittest.TestCase ):
         # the result is equal to [0, 1, 2, 3, 4, 5, 6, 7]
         self.assertEqual(result, range(8) )        
     
+    def test_bfs_recursive(self):
+                result = []
+                bfs_recursive( [self.nodes[0]], result,"children" )
+                # the result is equal to [0, 1, 2, 3, 4, 5, 6, 7]
+                self.assertEqual(result, range(8) )           
 
     def test_bfs_iterative(self):
         result = []
@@ -244,7 +253,7 @@ class TreeTestCase( unittest.TestCase ):
         
     def test_bfs_iterative_2(self):
         result = []
-        bfs_iterative( [self.nodes[1]], result ,"parentsandchildren")
+        bfs_iterative( [self.nodes[1]], result ,"undirected")
         # the result is equal to [1, 0, 4, 5, 6, 2, 3, 9, 7, 8]
         self.assertEqual(result, [1, 0, 4, 5, 6, 2, 3, 9, 7, 8] )
     
@@ -257,7 +266,7 @@ class TreeTestCase( unittest.TestCase ):
    
     def test_dfs_iterative(self):        
         result = []
-        dfs_iterative( self.nodes[4], result, "parentsandchildren")
+        dfs_iterative( self.nodes[4], result, "undirected")
         # the result is equal to [4, 1, 9, 0, 8]
         self.assertEqual(result, [4, 1, 0, 2, 3, 5, 7, 6, 9, 8])
         

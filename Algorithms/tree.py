@@ -2,19 +2,13 @@ import pprint
 import unittest 
 from stack import Stack 
 
-'''Binary tree with the 3 standard traversal algorithms.
+'''Tree with depth first and breadth first traversal algorithms
 
-Each node has two children. Therefore, when visiting a given node, 
-it is possible to: 
-1: deal with the current node, then its left child (the left subtree), 
-and then its right child (pre-order)
-2: deal with the left child, the current node, and the right child (in-order)
-3: deal with the left child, the right child, and the current node (post-order)
+Each node may have several children. 
 
-In the case of a tree with an arbitrary number of children (not binary), 
-in-order would not make sense, and there are two traversal algorithms: 
 1: deal with the node and then with all children (with all subtrees) (breadth-first search or BFS)
 2: deal with all children and finally with the node (depth-first search of DFS)  
+
 
 The traversal algorithms are implemented as separate functions, 
 following a simple visitor pattern. 
@@ -27,14 +21,9 @@ See for example NodeSquared
 
 - by providing additional visitors, the user can change the order of the graph
 traversal, or change the implementation of a given graph traversal algorithm 
-for better performance. In this module, I played with several implementations.
+for better performance. In this module, there are several implementations.
 
-Exercises for Alice: 
-- modify this file to provide post-order recursive and iterative algorithms, 
-with their test cases 
-- provide a similar module for a tree with an arbitrary number of children. 
-the module should feature a Node class, a DFS visitor and a BFS visitor.
-- do the same in C++ 
+
 '''
 
 
@@ -77,7 +66,7 @@ class NodeSquared(Node):
 
     
 def bfs_recursive(nodes, result):
-    '''pre-order, recursive implementation
+    '''Breadth first recursive implementation
     each recursion is one level down the tree'''
     childnodes=[]
     if len(nodes) is 0:
@@ -91,7 +80,8 @@ def bfs_recursive(nodes, result):
 
 
 def bfs_iterative(nodes, result):
-    
+    '''Breadth first iterative implementation
+       '''    
     childnodes=[]
     while len(nodes):
         for node in nodes:
@@ -104,15 +94,13 @@ def bfs_iterative(nodes, result):
     
 def dfs_recursive(root, result):
     '''depth first search recursive implementation
-    each recursion is one level down the tree'''
+    '''
     if root is None:
         return 
     result.append( root.visit() )
     for node in root.children:
         dfs_recursive(node, result)
         
-
-
 
 def dfs_iterative(root, result):
     '''depth first search iterative implementation
@@ -194,10 +182,10 @@ class TreeTestCase( unittest.TestCase ):
         self.assertEqual(result, [0, 1, 4, 5, 7, 6, 2, 3])
         
     def test_dfs_iterative_2(self):        
-            result = []
-            dfs_iterative_2( self.root, result )
-            # the result is equal to [0, 3, 2, 1, 6, 5, 7, 4] #for this algoritm more "natural" to do children "backwards"
-            self.assertEqual(result, [0, 3, 2, 1, 6, 5, 7, 4])
+        result = []
+        dfs_iterative_2( self.root, result )
+        # the result is equal to [0, 3, 2, 1, 6, 5, 7, 4] #for this algoritm more "natural" to do children "backwards"
+        self.assertEqual(result, [0, 3, 2, 1, 6, 5, 7, 4])
 
 if __name__ == '__main__':
     unittest.main()
