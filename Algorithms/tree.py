@@ -23,9 +23,7 @@ See for example NodeSquared
 traversal, or change the implementation of a given graph traversal algorithm 
 for better performance. In this module, there are several implementations.
 
-
 '''
-
 
 class Node(object):
     '''
@@ -77,7 +75,6 @@ def bfs_recursive(nodes, result):
     bfs_recursive(childnodes, result)
         
 
-
 def bfs_iterative(nodes, result):
     '''Breadth first iterative implementation
        '''    
@@ -124,7 +121,6 @@ def dfs_iterative_2(root, result):
         for node in node.children:
             todo.append(node)
         
-
 
 
 class TreeTestCase( unittest.TestCase ):

@@ -80,16 +80,12 @@ class BreadthFirstSearch(object):
         self.visited=dict()
         self.bfs_recursive([root],linktype)
         
-          
-
     def visit(self, node):
         if self.visited.get(node, False):
             return
         self.result.append( node.getValue() )
         self.visited[node]=True
-        
-
-        
+             
     def bfs_recursive(self,nodes, linktype ):
         '''Breadth first recursive implementation
         each recursion is one level down the tree

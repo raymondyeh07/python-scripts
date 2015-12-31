@@ -114,7 +114,6 @@ def inorder_recursive(node, result):
     inorder_recursive(node.right, result)
 
 
-
 def inorder_iterative_visit1(root, result):
     '''
     in-order, iterative implementation.
@@ -187,7 +186,6 @@ def postorder_recursive(node, result):
     result.append( node.visit() )
 
 
-
 def postorder_iterative_1(root, result):
     '''We effectively find the nodes from last to first
     so when we find each node we append to the start of the result not the back    
@@ -206,6 +204,7 @@ def postorder_iterative_1(root, result):
                 todo.append( node.left )
         else:
             todo.pop()
+
 
 def postorder_iterative(root, result):
     '''version without visited
@@ -228,7 +227,6 @@ def postorder_iterative(root, result):
         else:
             todo.pop()
         
-
 
 class BinaryTreeTestCase( unittest.TestCase ):
 

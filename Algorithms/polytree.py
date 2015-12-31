@@ -49,21 +49,20 @@ class Node(object):
         self.children = []
         self.parents = []
         self.undirectedlinks =  [] # other implementations possible
-        self.visited = False #required for undirected searches
+        self.visited = False #required for undirected searches     
       
     def visit(self):
         return self.value
-
+    
     def add_child(self, child):
         '''set the children'''
         self.children.append(child)
-        self.undirectedlinks.append(child)
+        self.undirectedlinks.append(child)       
  
     def add_parent(self, parent):
         '''set the parents'''
         self.parents.append(parent)
         self.undirectedlinks.append(parent)
-
         
     def get_linked_nodes(self, type):  #ask colin, I imagine there is a more elegant Python way to do this
         if (type is "children"):
@@ -72,6 +71,7 @@ class Node(object):
             return self.parents
         if(type is "undirected"):
             return self.undirectedlinks
+        
 
     def __repr__(self):
         '''unique string representation'''     
@@ -80,19 +80,18 @@ class Node(object):
             children=self.children
             ) )
 
-
     
 def bfs_children_recursive(nodes, result):
     '''pre-order, recursive implementation
     each recursion is one level down the tree'''
     bfs_base_recursive(nodes, result,"children")
+    
 
 def bfs_parents_recursive(nodes, result):
     '''pre-order, recursive implementation
     each recursion is one level down the tree'''
     bfs_base_recursive(nodes, result,"parents")
  
-
        
 def bfs_recursive(nodes,result, linktype ):
     '''pre-order, recursive implementation
@@ -109,6 +108,7 @@ def bfs_recursive(nodes,result, linktype ):
             linknodes.extend(node.get_linked_nodes(linktype))
             node.visited=True
     bfs_recursive(linknodes, result, linktype)
+    
 
 def bfs_iterative(nodes, result,linktype):
     '''breadth first iterative implementation
@@ -169,8 +169,6 @@ def dfs_iterative_2(root, result,linktype):
         for node in node.get_linked_nodes(linktype):
             if (not node.visited):     
                 todo.append(node)
-        
-
 
 
 class TreeTestCase( unittest.TestCase ):
@@ -179,7 +177,6 @@ class TreeTestCase( unittest.TestCase ):
         '''
         called before every test. 
         0 and 8 are root/head nodes
-        
         
         8
          \
@@ -196,10 +193,7 @@ class TreeTestCase( unittest.TestCase ):
         0--2  6
          \   /
           \ /
-           3
-           
-           
-        
+           3       
         '''
         # building all nodes
         self.nodes = dict( (i, Node(i) ) for i in range(10) )
@@ -243,7 +237,6 @@ class TreeTestCase( unittest.TestCase ):
         # the result is equal to [1, 0, 4, 5, 6, 2, 3, 9, 7, 8]
         self.assertEqual(result, [1, 0, 4, 5, 6, 2, 3, 9, 7, 8] )
     
-
     def test_dfs_recursive(self):
         result = []
         dfs_recursive( self.nodes[0], result,"children" )

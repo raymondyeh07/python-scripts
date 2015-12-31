@@ -3,7 +3,7 @@ import unittest
 from stack import Stack 
 
 '''Tree with Depth First and Breadth First traversal algorithms
-implemented using a visitor pattern (allows improved independence
+implemented using a full visitor pattern (allows improved independence
 of Node from algorithm)
 
 Each node may have several children. 
@@ -15,7 +15,6 @@ on which it operates and without modifying the objects structures (eg a visited 
 owned by the algorithm)
 
 The visitor pattern also allows the visit method to dynamically depend on both  the object and the visitor
-
 '''
 
 
@@ -31,19 +30,16 @@ class Node(object):
         '''
         self.value = value   # wrapped object
         self.children = []
-        
 
     def get_value(self):
         return self.value
-    
+   
     def accept(self, visitor):
         visitor.visit(self)
-             
-
+           
     def set_children(self, children):
         '''set the children'''
         self.children = children
-
 
     def __repr__(self):
         '''unique string representation'''
@@ -57,11 +53,9 @@ class DepthFirstSearch(object):
     
     def __init__(self,root, nodes, first_label=0):
         '''Perform the Depth First Search on nodes'''
-    
         self.result=[]
         root.accept(self)
           
-
     def visit(self, node):
         '''visit one node.'''
         self.result.append(node.get_value())
@@ -73,7 +67,6 @@ class BreadthFirstSearch(object):
     
     def __init__(self,root, nodes, first_label=0):
         '''Perform the Breadth First Search through the nodes'''
-    
         self.result=[]
         self.bfs_recursive([root])
           
@@ -84,7 +77,7 @@ class BreadthFirstSearch(object):
         childnodes=[]
         if len(nodes) is 0:
             return         
-        for node in nodes: #gather all nodes from next layer before recursing
+        for node in nodes: #gather all nodes from next layer into childnodes before recursing
             node.accept(self)
             childnodes.extend(node.children)
             
