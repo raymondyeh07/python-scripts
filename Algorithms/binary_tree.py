@@ -2,7 +2,7 @@ import pprint
 import unittest 
 from stack import Stack 
 
-'''Binary tree with the 3 standard traversal algorithms.
+'''Binary tree with standard traversal algorithms.
 
 Each node has two children. Therefore, when visiting a given node, 
 it is possible to: 
@@ -29,12 +29,9 @@ See for example NodeSquared
 traversal, or change the implementation of a given graph traversal algorithm 
 for better performance. In this module, I played with several implementations.
 
-Exercises for Alice: 
-- modify this file to provide post-order recursive and iterative algorithms, 
-with their test cases 
-- provide a similar module for a tree with an arbitrary number of children. 
-the module should feature a Node class, a DFS visitor and a BFS visitor.
-- do the same in C++ 
+Exercises carried out by Alice: 
+- post-order recursive and iterative algorithms, with their test cases 
+
 '''
 
 

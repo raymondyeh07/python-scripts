@@ -4,28 +4,21 @@ from stack import Stack
 
 '''PolyTree with depth first and breadth first traversal algorithms
 
-Each node may have several children. 
-Each node may have several parents.
 
-The PolyTree is directed and acyclic. It may have multiple roots ( a node without a parent)
-
-
-The traversal algorithms are implemented as separate functions, 
-following a simple visitor pattern. 
-
-BFS and DFS for children of the node
-1: deal with the node and then with all children (with all subtrees) (breadth-first search or BFS)
-2: deal with all children and finally with the node (depth-first search of DFS)  
-
-BFS and DFS for parents of the node
-3: deal with the node and then with all children (with all subtrees) (breadth-first search or BFS)
-4: deal with all children and finally with the node (depth-first search of DFS)  
-
-full polytree search
-5: breadth first from the node treating it as an undirected tree 
-6: breadth first search with root nodes coming first children later 
+The PolyTree is directed and acyclic. Each node may have several children. 
+Each node may have several parents. The polytree may have multiple roots ( a node without a parent)
+It has no loops when directed, but may have loops when traversed in an undirected way
 
 
+The traversal algorithms are implemented as separate functions.
+
+BFS: deal with the node and all nodes at the same "depth" then with all children of these nodes etc (breadth-first search or BFS)
+DFS: deal with the node and the subtree of first child, subtree of second child etc (depth-first search of DFS)  
+
+Implement for
+Children
+Parents
+Undirectedlink (connected)
 
 
 The advantage of this pattern are the following: 
@@ -55,21 +48,22 @@ class Node(object):
         self.value = value   # wrapped object
         self.children = []
         self.parents = []
-        self.undirectedlinks =  [] # ask colin about best Python way to deal with this
-        self.visited = False
+        self.undirectedlinks =  [] # other implementations possible
+        self.visited = False #required for undirected searches
       
     def visit(self):
         return self.value
 
-    def set_children(self, children):
+    def add_child(self, child):
         '''set the children'''
-        self.children = children
-        self.undirectedlinks.extend(children)
-        
-    def set_parents(self, parents):
+        self.children.append(child)
+        self.undirectedlinks.append(child)
+ 
+    def add_parent(self, parent):
         '''set the parents'''
-        self.parents = parents
-        self.undirectedlinks.extend(parents)
+        self.parents.append(parent)
+        self.undirectedlinks.append(parent)
+
         
     def get_linked_nodes(self, type):  #ask colin, I imagine there is a more elegant Python way to do this
         if (type is "children"):
@@ -78,20 +72,14 @@ class Node(object):
             return self.parents
         if(type is "undirected"):
             return self.undirectedlinks
-            
-         
 
     def __repr__(self):
-        '''unique string representation'''
-        
+        '''unique string representation'''     
         return str('node: {val} {children}'.format(
             val = self.value,
             children=self.children
             ) )
 
-class NodeSquared(Node):
-    def visit(self):
-        return self.value**2
 
     
 def bfs_children_recursive(nodes, result):
@@ -227,11 +215,9 @@ class TreeTestCase( unittest.TestCase ):
         self.set_link(self.nodes[9],self.nodes[4])
         
     def set_link(self, parent, child):
-            '''set the parents child links'''
-            parent.children.append(child)
-            parent.undirectedlinks.append(child)
-            child.parents.append(parent)                 
-            child.undirectedlinks.append(parent)    
+        '''set the parents child links'''
+        parent.add_child(child)
+        child.add_parent(parent)      
                         
     def test_bfs_recursive(self):
         result = []
@@ -240,10 +226,10 @@ class TreeTestCase( unittest.TestCase ):
         self.assertEqual(result, range(8) )        
     
     def test_bfs_recursive(self):
-                result = []
-                bfs_recursive( [self.nodes[0]], result,"children" )
-                # the result is equal to [0, 1, 2, 3, 4, 5, 6, 7]
-                self.assertEqual(result, range(8) )           
+        result = []
+        bfs_recursive( [self.nodes[0]], result,"children" )
+        # the result is equal to [0, 1, 2, 3, 4, 5, 6, 7]
+        self.assertEqual(result, range(8) )           
 
     def test_bfs_iterative(self):
         result = []
@@ -271,9 +257,9 @@ class TreeTestCase( unittest.TestCase ):
         self.assertEqual(result, [4, 1, 0, 2, 3, 5, 7, 6, 9, 8])
         
     def test_dfs_iterative_2(self):        
-            result = []
-            dfs_iterative_2( self.nodes[4], result, "parents" )
-            # the result is equal to  #for this algoritm more "natural" to do children "backwards"
-            self.assertEqual(result, [4, 9, 8,  1, 0])
+        result = []
+        dfs_iterative_2( self.nodes[4], result, "parents" )
+        # the result is equal to  #for this algoritm more "natural" to do children "backwards"
+        self.assertEqual(result, [4, 9, 8,  1, 0])
 if __name__ == '__main__':
     unittest.main()

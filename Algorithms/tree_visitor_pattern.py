@@ -7,8 +7,8 @@ implemented using a visitor pattern (allows improved independence
 of Node from algorithm)
 
 Each node may have several children. 
-1: deal with the node and then with all children (with all subtrees) (breadth-first search or BFS)
-2: deal with all children and finally with the node (depth-first search of DFS)  
+1: deal with the node and then with all children (and then all children of these children) (breadth-first search or BFS)
+2: deal with the node and then its first child (and subtree), second child (and subtree) etc (depth-first search of DFS)  
 
 A visitor pattern is used to allow the algorithms to be separated from the object 
 on which it operates and without modifying the objects structures (eg a visited flag can be 
@@ -47,11 +47,11 @@ class Node(object):
 
     def __repr__(self):
         '''unique string representation'''
-        
         return str('node: {val} {children}'.format(
             val = self.value,
             children=self.children
             ) )
+    
 
 class DepthFirstSearch(object):
     
@@ -67,6 +67,7 @@ class DepthFirstSearch(object):
         self.result.append(node.get_value())
         for node in node.children:
             node.accept(self)
+            
 
 class BreadthFirstSearch(object):
     
@@ -76,7 +77,6 @@ class BreadthFirstSearch(object):
         self.result=[]
         self.bfs_recursive([root])
           
-
     def visit(self, node):
         self.result.append( node.get_value() )
         
@@ -90,9 +90,6 @@ class BreadthFirstSearch(object):
             
         self.bfs_recursive(childnodes)
         
-
-            
-
 
 class TreeTestCase( unittest.TestCase ):
 
@@ -118,9 +115,9 @@ class TreeTestCase( unittest.TestCase ):
         # building all nodes
         self.nodes = dict( (i, Node(i) ) for i in range(8) )
         # setting children. note that each node keeps track of its children,
-        self.nodes[0].set_children( [self.nodes[1], self.nodes[2], self.nodes[3] ])
+        self.nodes[0].set_children( [self.nodes[1], self.nodes[2], self.nodes[3]])
         self.nodes[1].set_children( [self.nodes[4], self.nodes[5] ,self.nodes[6]])
-        self.nodes[5].set_children([self.nodes[7]])
+        self.nodes[5].set_children( [self.nodes[7]])
         
         # decide on a root for the tests
         self.root = self.nodes[0]
@@ -130,8 +127,8 @@ class TreeTestCase( unittest.TestCase ):
     def test_DFS_visitor_pattern(self):
         
         DFS = DepthFirstSearch(self.nodes[0],self.nodes)
-        # the result is equal to [0, 1, 4, 5, 7, 6, 2 , 3,]
-        self.assertEqual(DFS.result, [0, 1, 4, 5, 7, 6, 2 , 3,] )
+        # the result is equal to [0, 1, 4, 5, 7, 6, 2, 3,]
+        self.assertEqual(DFS.result, [0, 1, 4, 5, 7, 6, 2, 3,] )
 
     def test_BFS_visitor_pattern(self):
             

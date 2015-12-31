@@ -6,8 +6,8 @@ from stack import Stack
 
 Each node may have several children. 
 
-1: deal with the node and then with all children (with all subtrees) (breadth-first search or BFS)
-2: deal with all children and finally with the node (depth-first search of DFS)  
+1: deal with the node and then with all children and then all the children of all the children etc (breadth-first search or BFS)
+2: deal with the node and then its first child (and the subtree of the first child) and the second child etc  (depth-first search DFS)
 
 
 The traversal algorithms are implemented as separate functions, 
@@ -39,7 +39,7 @@ class Node(object):
         '''
         self.value = value   # wrapped object
         self.children = []
-        self.visited = False
+        # self.visited = False
         # not necessary for standard visitors, and inelegant.
         # indeed,  it is good to able to call another visitor on the same nodes
         # without having to re-initialize the nodes.
@@ -50,7 +50,6 @@ class Node(object):
     def set_children(self, children):
         '''set the children'''
         self.children = children
-
 
     def __repr__(self):
         '''unique string representation'''
@@ -82,7 +81,7 @@ def bfs_recursive(nodes, result):
 def bfs_iterative(nodes, result):
     '''Breadth first iterative implementation
        '''    
-    childnodes=[]
+    childnodes=[] #childnodes will collect a list of all the nodes one level "down"
     while len(nodes):
         for node in nodes:
             result.append( node.visit() )
@@ -148,8 +147,8 @@ class TreeTestCase( unittest.TestCase ):
         '''
         # building all nodes
         self.nodes = dict( (i, Node(i) ) for i in range(8) )
+        
         # setting children. note that each node keeps track of its children,
-        # no need for the polytree class
         self.nodes[0].set_children( [self.nodes[1], self.nodes[2], self.nodes[3] ])
         self.nodes[1].set_children( [self.nodes[4], self.nodes[5] ,self.nodes[6]])
         self.nodes[5].set_children([self.nodes[7]])
