@@ -20,19 +20,10 @@ Children
 Parents
 Undirectedlink (connected)
 
-
-The advantage of this pattern are the following: 
-
-- by changing the node class (e.g. subclassing and overloading the visit function), 
-a user can decide on what to do when a node is visited. 
-See for example NodeSquared
-
-- by providing additional visitors, the user can change the order of the graph
+By providing additional visitors, the user can change the order of the graph
 traversal, or change the implementation of a given graph traversal algorithm 
 for better performance. In this module, there are several implementations.
 
-
-'''
 
 
 class Node(object):
