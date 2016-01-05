@@ -8,9 +8,10 @@ The PolyTree is directed and acyclic. Each node may have several children.
 Each node may have several parents. The polytree may have multiple roots ( a node without a parent)
 It has no loops when directed, but may have loops when traversed in an undirected way
 
-Traversals
-1: deal with all nodes at the same level and then with all children of these nodes etc (breadth-first search or BFS)
-2: deal with all children and finally with the node (depth-first search of DFS)  
+Breadth First Traversals
+- deal with all nodes at the same level and then with all children of these nodes etc (breadth-first search or BFS)
+(a) recursively
+(b) iteratively
 
 A visitor pattern is used to allow the algorithms to be separated from the object 
 on which it operates and without modifying the objects structures (eg a visited flag can be 
