@@ -2,7 +2,7 @@ import pprint
 import unittest 
 from stack import Stack 
 
-'''Binary tree with the 3 standard traversal algorithms.
+'''Binary tree with standard traversal algorithms.
 
 Each node has two children. Therefore, when visiting a given node, 
 it is possible to: 
@@ -29,12 +29,9 @@ See for example NodeSquared
 traversal, or change the implementation of a given graph traversal algorithm 
 for better performance. In this module, I played with several implementations.
 
-Exercises for Alice: 
-- modify this file to provide post-order recursive and iterative algorithms, 
-with their test cases 
-- provide a similar module for a tree with an arbitrary number of children. 
-the module should feature a Node class, a DFS visitor and a BFS visitor.
-- do the same in C++ 
+Exercises carried out by Alice: 
+- post-order recursive and iterative algorithms, with their test cases 
+
 '''
 
 
@@ -54,7 +51,7 @@ class Node(object):
         self.value = value   # wrapped object
         self.left = None     # left child 
         self.right = None    # right child
-        # self.visited = False
+        self.visited = False
         # not necessary for standard visitors, and inelegant.
         # indeed,  it is good to able to call another visitor on the same nodes
         # without having to re-initialize the nodes.
@@ -105,7 +102,7 @@ def preorder_iterative(root, result):
             todo.append(node.right)
         if node.left:
             todo.append(node.left)
-        result.append( node.value )
+        result.append( node.visit() )
 
 
 def inorder_recursive(node, result):
@@ -115,7 +112,6 @@ def inorder_recursive(node, result):
     inorder_recursive(node.left, result)
     result.append( node.visit() )
     inorder_recursive(node.right, result)
-
 
 
 def inorder_iterative_visit1(root, result):
@@ -138,7 +134,7 @@ def inorder_iterative_visit1(root, result):
                 node.visited = True
                 todo.append( node.left )
             else:
-                result.append( node.value )
+                result.append( node.visit() ) # changed to node.visit to make more general
                 todo.pop()
                 todo.append( node.right )
         else:
@@ -159,7 +155,7 @@ def inorder_iterative_visit2(root, result):
                 todo.append( node ) # re-adding the node for second visit
                 todo.append( node.left )
             else:
-                result.append( node.value )
+                result.append( node.visit() ) # changed to node.visit to make more general
                 todo.append( node.right )
 
 
@@ -176,14 +172,63 @@ def inorder_iterative(root, result):
                 todo.append( node )
                 todo.append( node.left )
             else:
-                result.append( node.value )
+                result.append( node.visit() ) # changed to node.visit to make more general
                 todo.append( node.right )
             last = node 
 
 
+def postorder_recursive(node, result):
+    '''post-order, recursive implementation'''
+    if node is None:
+        return 
+    postorder_recursive(node.left, result)
+    postorder_recursive(node.right, result)
+    result.append( node.visit() )
 
 
-class TreeTestCase( unittest.TestCase ):
+def postorder_iterative_1(root, result):
+    '''We effectively find the nodes from last to first
+    so when we find each node we append to the start of the result not the back    
+    This version uses visited'''
+    todo = Stack()
+    todo.append( root )
+    while len(todo):
+        node = todo.peek()
+        if node:
+            if not node.visited:
+                node.visited = True
+                result.insert(0,node.visit()) #add to back
+                todo.append( node.right )
+            else:
+                todo.pop()
+                todo.append( node.left )
+        else:
+            todo.pop()
+
+
+def postorder_iterative(root, result):
+    '''version without visited
+    we find the nodes from last to first
+    so each node is inserted at the start of the result not the back
+    an alternative might be to reverse the result at the end'''  
+    todo = Stack()
+    todo.append( root )
+    last = None
+    while len(todo):
+        node = todo.peek()
+        if node:
+            if not last or last.right is node or last.left is node:
+                result.insert(0,node.visit())
+                todo.append( node.right )
+            else:
+                todo.pop()
+                todo.append( node.left )
+            last=node
+        else:
+            todo.pop()
+        
+
+class BinaryTreeTestCase( unittest.TestCase ):
 
     def setUp(self):
         '''
@@ -237,6 +282,20 @@ class TreeTestCase( unittest.TestCase ):
         inorder_iterative( self.root, result )
         self.assertEqual(result, range(6) )
  
+    def test_postorder_recursive(self):
+        result = []
+        postorder_recursive( self.root, result )
+        self.assertEqual(result, [1, 0, 3, 2, 5, 4] )
+
+    def test_postorder_iterative(self):
+        result = []
+        postorder_iterative( self.root, result )
+        self.assertEqual(result, [1, 0, 3, 2, 5, 4] )
+
+    def test_postorder_iterative_1(self):
+        result = []
+        postorder_iterative_1( self.root, result )
+        self.assertEqual(result, [1, 0, 3, 2, 5, 4] )
 
 if __name__ == '__main__':
     unittest.main()
