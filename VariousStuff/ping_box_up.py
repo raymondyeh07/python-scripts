@@ -9,32 +9,34 @@ def mailto(to_addr, message, subject='', from_addr='colin.bernet@cern.ch'):
     msg = MIMEText(message)
     msg['Subject'] = subject
     msg['From'] = from_addr
-    msg['To'] = to_addr
+    msg['To'] = ', '.join(to_addr)
     s = smtplib.SMTP('localhost')
-    s.sendmail(from_addr, [to_addr], msg.as_string())
+    s.sendmail(from_addr, to_addr, msg.as_string())
     s.quit()
 
 def action_up():
-    mailto('colin.bernet@cern.ch', '', '{ip} is up!'.format(ip=hostname) )
+    mailto(['colin.bernet@cern.ch', 'colin.bernet@gmail.com'], 
+           '', '{ip} is up!'.format(ip=hostname) )
 
 def action_down():
     addrs = ['colin.bernet@cern.ch',
              'colin.bernet@gmail.com']
     if hostname == ip_bernet:
-        addrs.append('bertrandmolinier@yahoo.fr')
-    for addr in addrs: 
-        mailto(addr, 
-               '''
+        addrs.extend([
+                'bertrandmolinier@yahoo.fr',
+                'petitemaud@gmail.com'])
+    msg = '''
 Salut Bertrand, 
 
 Pourrais-tu relever le disjoncteur s'il te plait? 
 Merci!
 
 Colin et Maud.
-''',
-               'Alerte: coupure de courant chez les Bernet!', 
-
-)
+'''
+    subject = 'Alerte: coupure de courant chez les Bernet!'
+    # for addr in addrs: 
+    #     mailto(addr, msg, subject)
+    mailto(addrs, msg, subject)
 
 
 ip_bernet = '88.175.213.86' # bernet bervilliere
