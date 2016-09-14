@@ -1,4 +1,5 @@
 import networkx as nx
+import matplotlib.pyplot as plt
 
 G = nx.DiGraph()
 
@@ -8,3 +9,5 @@ for n in nx.dfs_postorder_nodes(G, 1):
     print n
 
 print G
+
+plt.Draw(G)
